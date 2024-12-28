@@ -7,9 +7,7 @@ export const getUsersForSidebar = async (req,res) =>  {
         // ne = not equal, Find all users not having id equal to the loggedin userID
         const filteredUsers = await User.find({_id: {$ne: loggedInUser}}).select("fullName email");
         
-        res.status(200).json({
-            filteredUsers: filteredUsers
-        })
+        res.status(200).json(filteredUsers)
     } catch (error) {
     console.error("Error in getting users for sidebar:", error); 
     res.status(500).json({
