@@ -12,16 +12,16 @@ export const protectedRoute = async (req, res, next) => {
             return res.status(401).json({msg: "Invalid token"});
         }
         const user = await User.findById(decoded.id).select("-password");
-        // console.log("id is: " + decoded.id);
         if(!user)   {
             return res.status(401).json({msg: "No user found with this token"});
         }
         req.user = user; //attach the user details to the request object
+        
         next();
 
     } catch (error) {
         console.error("Error in protectedRoute:", error.message);
-        res.status(500).json({ msg: "Internal server error bdfjsd" });
+        res.status(500).json({ msg: "Internal server error in middleware" });
     }
     
 

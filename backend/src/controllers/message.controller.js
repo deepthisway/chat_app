@@ -1,6 +1,6 @@
 import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
-
+import cloudinary from "../lib/cloudinary.js"
 export const getUsersForSidebar = async (req,res) =>  {
     try {
         const loggedInUser = req.user._id;
@@ -23,8 +23,8 @@ export const getMessages = async (req, res) => {
 
         const messages  = await Message.find({
             $or: [
-                {sender: myId, receiver: userToChatId},
-                {sender: userToChatId, receiver: myId}
+                {senderId: myId, receiverId: userToChatId},
+                {senderId: userToChatId, receiverId: myId}
             ]
         })
         res.status(200).json(messages);
@@ -43,14 +43,24 @@ export const sendMessage = async (req,res) =>   {
         const {id: receiverId} = req.params;
         const senderId = req.user._id;
 
-        let imageUrl;
+        // console.log("senderId:", senderId);
+        // console.log("receiverId:", receiverId);
+    
+        if (!text && !image) {
+            return res.status(400).json({ msg: "Message text or image is required" });
+          }
+
+        let imageUrl = null;
         if(image)   {
+            console.log("Entered cloudinary");
+            
             const uploadResponse = await cloudinary.uploader.upload(image); // returns an object having the uplloaded image url;
+            console.log("passed cloudinary upload");
             imageUrl = uploadResponse.url;
         }
         const newMessage = new Message({
-            sender: senderId,
-            receiver: receiverId,
+            senderId,
+            receiverId,
             text: text,
             image: imageUrl
         })
@@ -61,6 +71,7 @@ export const sendMessage = async (req,res) =>   {
         res.status(200).json(newMessage);
     } catch (error) {
         res.status(500).json({
+            error: error,
             msg: "Internal server error in sending message"
         })
     }
