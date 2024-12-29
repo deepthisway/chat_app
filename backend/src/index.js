@@ -20,6 +20,7 @@ app.use(cors({
     methods: 'GET,POST,PUT,DELETE',
     credentials: true
 }));
+
 app.use('/api/auth', authRoutes);
 app.use('/api/messages', messageRoutes);
 
